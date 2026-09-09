@@ -9,14 +9,13 @@
     <!-- 引入 Chart.js (圖表套件) -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; /* 防止整個網頁出現雙重捲軸 */ }
+        body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; }
         .navbar-brand { font-weight: bold; }
-        .win-text { color: #dc3545; font-weight: bold; } /* 贏錢顯示紅色 */
-        .lose-text { color: #198754; } /* 輸錢顯示綠色 */
+        .win-text { color: #dc3545; font-weight: bold; } 
+        .lose-text { color: #198754; } 
         
-        /* 歷史紀錄表格專用設定 (動態填滿螢幕、凍結表頭) */
+        /* ================= 歷史紀錄表格專用設定 ================= */
         .table-container {
-            /* 100vh(螢幕總高) 扣除 導覽列與頁籤的大約高度，讓捲軸永遠停在畫面底部 */
             height: calc(100vh - 180px); 
             overflow-x: auto;
             overflow-y: auto;
@@ -26,33 +25,74 @@
             border-collapse: separate;
             border-spacing: 0;
         }
-        /* 凍結第一列表頭 (標題) */
-        .table-container thead tr:nth-child(1) th {
+
+        /* ---- 上方凍結 (表頭) ---- */
+        #historyTable thead tr:nth-child(1) th {
             position: sticky;
             top: 0;
             background-color: #e9ecef !important;
             z-index: 3;
             border-bottom: 2px solid #dee2e6;
         }
-        /* 凍結第二列表頭 (累積金額) */
-        .table-container thead tr:nth-child(2) th {
+        #historyTable thead tr:nth-child(2) th {
             position: sticky;
-            top: 41px; /* 會由 JS 動態校正 */
+            top: 41px; /* 會由 JS 動態校正精準高度 */
             background-color: #f8f9fa !important;
             z-index: 3;
             border-bottom: 2px solid #dee2e6;
             font-size: 0.95rem;
         }
-        
+
+        /* ---- 左側凍結 (局數、日期) ---- */
+        #historyTable th:nth-child(1), 
+        #historyTable td:nth-child(1) {
+            position: sticky;
+            left: 0;
+            z-index: 2;
+        }
+        #historyTable th:nth-child(2), 
+        #historyTable td:nth-child(2) {
+            position: sticky;
+            left: 60px; /* 剛好接在第一欄後面 */
+            z-index: 2;
+            box-shadow: 3px 0 5px -2px rgba(0,0,0,0.15); /* 淡淡陰影，增加立體感 */
+        }
+
+        /* ---- 十字路口交集 (同時凍結上方與左側，層級需最高) ---- */
+        #historyTable thead tr:nth-child(1) th:nth-child(1),
+        #historyTable thead tr:nth-child(1) th:nth-child(2) {
+            z-index: 5; 
+        }
+        /* 第二列表頭的「累積金額」欄位 (colspan=2 橫跨局數與日期) */
+        #historyTable thead tr:nth-child(2) th:nth-child(1) {
+            position: sticky;
+            left: 0;
+            z-index: 5;
+            box-shadow: 3px 0 5px -2px rgba(0,0,0,0.15); /* 陰影延續 */
+        }
+
+        /* ---- 修復斑馬紋與凍結欄位滑動時的底色問題 ---- */
+        #historyTable tbody tr:nth-of-type(odd) td:nth-child(1),
+        #historyTable tbody tr:nth-of-type(odd) td:nth-child(2) {
+            background-color: #f2f2f2 !important;
+        }
+        #historyTable tbody tr:nth-of-type(even) td:nth-child(1),
+        #historyTable tbody tr:nth-of-type(even) td:nth-child(2) {
+            background-color: #ffffff !important;
+        }
+        #historyTable tbody tr:hover td:nth-child(1),
+        #historyTable tbody tr:hover td:nth-child(2) {
+            background-color: #ececec !important; /* 滑鼠經過的底色 */
+        }
+        /* ======================================================= */
+
         .chart-container { position: relative; height: calc(100vh - 250px); width: 100%; }
         .nav-tabs .nav-link { color: #495057; font-weight: 500; }
         .nav-tabs .nav-link.active { font-weight: bold; color: #0d6efd; }
         
-        /* 排行榜點擊效果 */
         .sortable { cursor: pointer; user-select: none; }
         .sortable:hover { background-color: #e9ecef !important; }
         
-        /* 勝率榜高度限制 */
         .leaderboard-container {
             height: calc(100vh - 180px);
             overflow-y: auto;
@@ -75,13 +115,11 @@
 </nav>
 
 <div class="container mt-3">
-    <!-- 讀取中提示 -->
     <div id="loading" class="text-center my-5">
         <div class="spinner-border text-primary" role="status"></div>
         <p class="mt-2">資料載入中，請稍候...</p>
     </div>
 
-    <!-- 主要內容區 (預設隱藏) -->
     <div id="mainContent" style="display: none;">
         
         <!-- 頁籤按鈕 -->
@@ -105,7 +143,6 @@
                 <div class="card shadow-sm">
                     <div class="card-body p-0">
                         <div class="table-container" id="historyTableContainer">
-                            <!-- 加入 table-striped 產生一深一淺斑馬紋 -->
                             <table class="table table-bordered table-striped table-hover mb-0 text-center" id="historyTable">
                                 <!-- 由 JS 動態生成 -->
                             </table>
@@ -223,9 +260,6 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    // ==========================================
-    // 系統設定與全域變數
-    // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbyaqTfTnxfAQuaiUi8UhkvgWjmLz6_U9mzKp0kp3PNzNzBEKwuB69sC6hnJhlN8QLWx/exec";
     
     let allData = { players: [], records: [] };
@@ -236,26 +270,21 @@
     
     let currentSortBy = 'rate';
 
-    // 初始化
     window.onload = () => {
         document.getElementById('recordDate').valueAsDate = new Date();
         fetchData();
         
-        // 微調歷史紀錄的第二列表頭高度，確保完美凍結不破版
         setTimeout(() => {
             let firstTh = document.querySelector('#historyTable thead tr:nth-child(1) th');
             if(firstTh) {
                 let h = firstTh.offsetHeight;
                 let css = document.createElement('style');
-                css.innerHTML = `.table-container thead tr:nth-child(2) th { top: ${h-1}px; }`;
+                css.innerHTML = `#historyTable thead tr:nth-child(2) th { top: ${h-1}px; }`;
                 document.head.appendChild(css);
             }
         }, 1000);
     };
 
-    // ==========================================
-    // 資料獲取與運算核心
-    // ==========================================
     async function fetchData() {
         document.getElementById('loading').style.display = 'block';
         document.getElementById('mainContent').style.display = 'none';
@@ -316,9 +345,6 @@
         sortLeaderboard(currentSortBy);
     }
 
-    // ==========================================
-    // UI 渲染
-    // ==========================================
     function formatMoney(num) {
         if(num == null || num === "") return "-";
         if(num > 0) return `<span class="win-text">+${num}</span>`;
@@ -327,21 +353,19 @@
     }
 
     function renderHistory() {
-        // 第一列：備註移到最後
         let thead = `<thead>
             <tr>
-                <th style="min-width:60px; z-index:4;">局數</th>
-                <th style="min-width:100px; z-index:4;">日期</th>`;
+                <th style="width: 60px; min-width: 60px;">局數</th>
+                <th style="width: 110px; min-width: 110px;">日期</th>`;
         sortedPlayers.forEach(p => thead += `<th>${p}</th>`);
-        thead += `<th style="min-width:120px; z-index:4;">備註</th></tr>`;
+        thead += `<th style="min-width:120px;">備註</th></tr>`;
         
-        // 第二列：累積金額，因為少了備註在前面，所以 colspan 改為 2 (局數+日期)
         thead += `<tr>
-                <th colspan="2" class="text-end text-muted" style="z-index:4;">目前累積金額 ➔</th>`;
+                <th colspan="2" class="text-end text-muted">目前累積金額 ➔</th>`;
         sortedPlayers.forEach(p => {
             thead += `<th>${formatMoney(playerStats[p].totalAmount)}</th>`;
         });
-        thead += `<th style="z-index:4;">-</th></tr></thead>`; // 備註欄位對應的累積金額格顯示 -
+        thead += `<th>-</th></tr></thead>`;
 
         let tbody = `<tbody>`;
         let reverseRecords = [...allData.records].sort((a,b) => b.id - a.id);
@@ -353,7 +377,7 @@
             sortedPlayers.forEach(p => {
                 tbody += `<td>${formatMoney(r.scores[p])}</td>`;
             });
-            tbody += `<td>${r.memo}</td></tr>`; // 備註移到最後
+            tbody += `<td>${r.memo}</td></tr>`;
         });
         tbody += `</tbody>`;
         document.getElementById('historyTable').innerHTML = thead + tbody;
@@ -445,9 +469,6 @@
         });
     }
 
-    // ==========================================
-    // 登入與新增紀錄操作
-    // ==========================================
     let loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
     let addRecordModal = new bootstrap.Modal(document.getElementById('addRecordModal'));
 
