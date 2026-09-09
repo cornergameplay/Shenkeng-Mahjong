@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>深坑麻將戰績紀錄</title>
+    <!-- 引入 Bootstrap 5 (UI 框架) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- 引入 Chart.js (圖表套件) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; /* 防止整個網頁出現雙重捲軸 */ }
+        .navbar-brand { font-weight: bold; }
+        .win-text { color: #dc3545; font-weight: bold; } /* 贏錢顯示紅色 */
+        .lose-text { color: #198754; } /* 輸錢顯示綠色 */
+        
+        /* 歷史紀錄表格專用設定 (動態填滿螢幕、凍結表頭) */
+        .table-container {
+            /* 100vh(螢幕總高) 扣除 導覽列與頁籤的大約高度，讓捲軸永遠停在畫面底部 */
+            height: calc(100vh - 180px); 
+            overflow-x: auto;
+            overflow-y: auto;
+        }
+        .table-container table {
+            white-space: nowrap;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        /* 凍結第一列表頭 (標題) */
+        .table-container thead tr:nth-child(1) th {
+            position: sticky;
+            top: 0;
+            background-color: #e9ecef !important;
+            z-index: 3;
+            border-bottom: 2px solid #dee2e6;
+        }
+        /* 凍結第二列表頭 (累積金額) */
+        .table-container thead tr:nth-child(2) th {
+            position: sticky;
+            top: 41px; /* 會由 JS 動態校正 */
+            background-color: #f8f9fa !important;
+            z-index: 3;
+            border-bottom: 2px solid #dee2e6;
+            font-size: 0.95rem;
+        }
+        
+        .chart-container { position: relative; height: calc(100vh - 250px); width: 100%; }
+        .nav-tabs .nav-link { color: #495057; font-weight: 500; }
+        .nav-tabs .nav-link.active { font-weight: bold; color: #0d6efd; }
+        
+        /* 排行榜點擊效果 */
+        .sortable { cursor: pointer; user-select: none; }
+        .sortable:hover { background-color: #e9ecef !important; }
+        
+        /* 勝率榜高度限制 */
+        .leaderboard-container {
+            height: calc(100vh - 180px);
+            overflow-y: auto;
+        }
+        .leaderboard-container thead th {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+    </style>
+</head>
+<body>
+
+<!-- 頂部導覽列 -->
+<nav class="navbar navbar-dark bg-dark shadow-sm">
+    <div class="container-fluid">
+        <span class="navbar-brand mb-0 h1">🀄 好友麻將戰績系統</span>
+        <button class="btn btn-outline-light btn-sm" onclick="showLoginModal()">➕ 新增紀錄</button>
+    </div>
+</nav>
+
+<div class="container mt-3">
+    <!-- 讀取中提示 -->
+    <div id="loading" class="text-center my-5">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p class="mt-2">資料載入中，請稍候...</p>
+    </div>
+
+    <!-- 主要內容區 (預設隱藏) -->
+    <div id="mainContent" style="display: none;">
+        
+        <!-- 頁籤按鈕 -->
+        <ul class="nav nav-tabs mb-3" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="history-tab" data-bs-toggle="tab" data-bs-target="#history" type="button" role="tab">📝 歷史紀錄</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="chart-tab" data-bs-toggle="tab" data-bs-target="#chart" type="button" role="tab">📈 走勢圖</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="leaderboard-tab" data-bs-toggle="tab" data-bs-target="#leaderboard" type="button" role="tab">🏆 勝率榜</button>
+            </li>
+        </ul>
+
+        <!-- 頁籤內容 -->
+        <div class="tab-content" id="myTabContent">
+            
+            <!-- 歷史紀錄 -->
+            <div class="tab-pane fade show active" id="history" role="tabpanel">
+                <div class="card shadow-sm">
+                    <div class="card-body p-0">
+                        <div class="table-container" id="historyTableContainer">
+                            <!-- 加入 table-striped 產生一深一淺斑馬紋 -->
+                            <table class="table table-bordered table-striped table-hover mb-0 text-center" id="historyTable">
+                                <!-- 由 JS 動態生成 -->
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 走勢圖 -->
+            <div class="tab-pane fade" id="chart" role="tabpanel">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <p class="text-muted small mb-2">💡 點擊上方玩家名稱可隱藏/顯示，X軸為將數順編。</p>
+                        <div class="chart-container">
+                            <canvas id="myChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 勝率榜 -->
+            <div class="tab-pane fade" id="leaderboard" role="tabpanel">
+                <div class="card shadow-sm">
+                    <div class="card-body p-0">
+                        <div class="leaderboard-container">
+                            <table class="table table-striped text-center mb-0">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>排名</th>
+                                        <th>玩家</th>
+                                        <th class="sortable" onclick="sortLeaderboard('rate')" title="點擊依勝率排序">勝率 ▼</th>
+                                        <th class="sortable" onclick="sortLeaderboard('amount')" title="點擊依金額排序">累計金額 ▼</th>
+                                        <th class="sortable" onclick="sortLeaderboard('games')" title="點擊依局數排序">局數 ▼</th>
+                                        <th class="sortable" onclick="sortLeaderboard('wins')" title="點擊依勝局排序">勝局 ▼</th>
+                                        <th class="sortable" onclick="sortLeaderboard('loses')" title="點擊依輸局排序">輸局 ▼</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="leaderboardTableBody">
+                                    <!-- 由 JS 動態生成 -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 登入 Modal -->
+<div class="modal fade" id="loginModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">管理員登入</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">帳號</label>
+                    <input type="text" class="form-control" id="loginAccount" placeholder="請輸入帳號 (支援中文)">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">密碼 (若無設定可留白)</label>
+                    <input type="password" class="form-control" id="loginPassword" placeholder="請輸入密碼">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary w-100" onclick="doLogin()">登入</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 新增紀錄 Modal -->
+<div class="modal fade" id="addRecordModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">➕ 新增對戰紀錄</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <label class="form-label">日期</label>
+                        <input type="date" class="form-control" id="recordDate">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">備註</label>
+                        <input type="text" class="form-control" id="recordMemo" placeholder="例如：打300/100">
+                    </div>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="mb-0">參賽人員與金額 (總和須為0)</h6>
+                    <button class="btn btn-sm btn-outline-success" onclick="addPlayerInputRow()">+ 新增人員</button>
+                </div>
+                
+                <div id="playerInputsContainer"></div>
+                
+                <div class="text-end mt-3 fw-bold">
+                    目前總和：<span id="currentSum" class="text-primary">0</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="submitRecord()">確認送出</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap 5 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // ==========================================
+    // 系統設定與全域變數
+    // ==========================================
+    const API_URL = "https://script.google.com/macros/s/AKfycbyaqTfTnxfAQuaiUi8UhkvgWjmLz6_U9mzKp0kp3PNzNzBEKwuB69sC6hnJhlN8QLWx/exec";
+    
+    let allData = { players: [], records: [] };
+    let playerStats = {};
+    let sortedPlayers = [];
+    let myChartInstance = null;
+    let availablePlayersForDropdown = [];
+    
+    let currentSortBy = 'rate';
+
+    // 初始化
+    window.onload = () => {
+        document.getElementById('recordDate').valueAsDate = new Date();
+        fetchData();
+        
+        // 微調歷史紀錄的第二列表頭高度，確保完美凍結不破版
+        setTimeout(() => {
+            let firstTh = document.querySelector('#historyTable thead tr:nth-child(1) th');
+            if(firstTh) {
+                let h = firstTh.offsetHeight;
+                let css = document.createElement('style');
+                css.innerHTML = `.table-container thead tr:nth-child(2) th { top: ${h-1}px; }`;
+                document.head.appendChild(css);
+            }
+        }, 1000);
+    };
+
+    // ==========================================
+    // 資料獲取與運算核心
+    // ==========================================
+    async function fetchData() {
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('mainContent').style.display = 'none';
+
+        try {
+            let res = await fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'getData' })
+            });
+            let result = await res.json();
+            
+            if(result.data) {
+                allData = result.data;
+                availablePlayersForDropdown = [...allData.players];
+                processData();
+            }
+        } catch (error) {
+            alert("資料載入失敗，請檢查網路連線。");
+        }
+
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('mainContent').style.display = 'block';
+    }
+
+    function processData() {
+        playerStats = {};
+        allData.players.forEach(p => {
+            playerStats[p] = { games: 0, wins: 0, loses: 0, totalAmount: 0, historySum: [0] };
+        });
+
+        let sortedRecords = [...allData.records].sort((a,b) => a.id - b.id);
+
+        sortedRecords.forEach(record => {
+            allData.players.forEach(p => {
+                let score = record.scores[p];
+                let lastSum = playerStats[p].historySum[playerStats[p].historySum.length - 1];
+                
+                if (score !== null && score !== "") {
+                    let numScore = Number(score);
+                    playerStats[p].games += 1;
+                    if (numScore >= 0) {
+                        playerStats[p].wins += 1;
+                    } else {
+                        playerStats[p].loses += 1;
+                    }
+                    playerStats[p].totalAmount += numScore;
+                    playerStats[p].historySum.push(lastSum + numScore);
+                } else {
+                    playerStats[p].historySum.push(lastSum);
+                }
+            });
+        });
+
+        sortedPlayers = [...allData.players].sort((a, b) => playerStats[b].games - playerStats[a].games);
+
+        renderHistory();
+        renderChart();
+        sortLeaderboard(currentSortBy);
+    }
+
+    // ==========================================
+    // UI 渲染
+    // ==========================================
+    function formatMoney(num) {
+        if(num == null || num === "") return "-";
+        if(num > 0) return `<span class="win-text">+${num}</span>`;
+        if(num < 0) return `<span class="lose-text">${num}</span>`;
+        return `<span>0</span>`;
+    }
+
+    function renderHistory() {
+        // 第一列：備註移到最後
+        let thead = `<thead>
+            <tr>
+                <th style="min-width:60px; z-index:4;">局數</th>
+                <th style="min-width:100px; z-index:4;">日期</th>`;
+        sortedPlayers.forEach(p => thead += `<th>${p}</th>`);
+        thead += `<th style="min-width:120px; z-index:4;">備註</th></tr>`;
+        
+        // 第二列：累積金額，因為少了備註在前面，所以 colspan 改為 2 (局數+日期)
+        thead += `<tr>
+                <th colspan="2" class="text-end text-muted" style="z-index:4;">目前累積金額 ➔</th>`;
+        sortedPlayers.forEach(p => {
+            thead += `<th>${formatMoney(playerStats[p].totalAmount)}</th>`;
+        });
+        thead += `<th style="z-index:4;">-</th></tr></thead>`; // 備註欄位對應的累積金額格顯示 -
+
+        let tbody = `<tbody>`;
+        let reverseRecords = [...allData.records].sort((a,b) => b.id - a.id);
+        
+        reverseRecords.forEach(r => {
+            tbody += `<tr>
+                <td>${r.id}</td>
+                <td>${r.date.substring(0,10)}</td>`;
+            sortedPlayers.forEach(p => {
+                tbody += `<td>${formatMoney(r.scores[p])}</td>`;
+            });
+            tbody += `<td>${r.memo}</td></tr>`; // 備註移到最後
+        });
+        tbody += `</tbody>`;
+        document.getElementById('historyTable').innerHTML = thead + tbody;
+    }
+
+    function sortLeaderboard(sortBy) {
+        currentSortBy = sortBy;
+        
+        let rankPlayers = [...sortedPlayers].filter(p => playerStats[p].games > 0);
+        
+        rankPlayers.sort((a, b) => {
+            let rateA = playerStats[a].wins / playerStats[a].games;
+            let rateB = playerStats[b].wins / playerStats[b].games;
+            
+            if (sortBy === 'rate') {
+                if (rateB !== rateA) return rateB - rateA;
+                return playerStats[b].games - playerStats[a].games; 
+            } else if (sortBy === 'amount') {
+                return playerStats[b].totalAmount - playerStats[a].totalAmount;
+            } else if (sortBy === 'games') {
+                return playerStats[b].games - playerStats[a].games;
+            } else if (sortBy === 'wins') {
+                return playerStats[b].wins - playerStats[a].wins;
+            } else if (sortBy === 'loses') {
+                return playerStats[b].loses - playerStats[a].loses;
+            }
+        });
+
+        let html = '';
+        rankPlayers.forEach((p, index) => {
+            let winRate = ((playerStats[p].wins / playerStats[p].games) * 100).toFixed(1);
+            let medal = index === 0 ? "🥇 " : index === 1 ? "🥈 " : index === 2 ? "🥉 " : "";
+            
+            html += `<tr>
+                <td>${medal}${index + 1}</td>
+                <td class="fw-bold">${p}</td>
+                <td class="fw-bold text-primary">${winRate}%</td>
+                <td>${formatMoney(playerStats[p].totalAmount)}</td>
+                <td>${playerStats[p].games}</td>
+                <td>${playerStats[p].wins}</td>
+                <td>${playerStats[p].loses}</td>
+            </tr>`;
+        });
+        
+        document.getElementById('leaderboardTableBody').innerHTML = html;
+    }
+
+    function renderChart() {
+        let ctx = document.getElementById('myChart').getContext('2d');
+        if(myChartInstance) myChartInstance.destroy();
+
+        let labels = ["起始"];
+        let sortedRecords = [...allData.records].sort((a,b) => a.id - b.id);
+        for(let i = 1; i <= sortedRecords.length; i++) {
+            labels.push(i);
+        }
+
+        const colors = ['#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6', '#bcf60c', '#fabebe', '#008080', '#e6beff', '#9a6324', '#fffac8'];
+
+        let datasets = [];
+        sortedPlayers.forEach((p, index) => {
+            if(playerStats[p].games === 0) return;
+            datasets.push({
+                label: p,
+                data: playerStats[p].historySum,
+                borderColor: colors[index % colors.length],
+                backgroundColor: colors[index % colors.length],
+                borderWidth: 2,
+                tension: 0.1,
+                pointRadius: 3
+            });
+        });
+
+        myChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: { labels: labels, datasets: datasets },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top' },
+                    tooltip: { mode: 'index', intersect: false }
+                },
+                scales: {
+                    y: { title: { display: true, text: '累積金額' } },
+                    x: { title: { display: true, text: '將數' } }
+                }
+            }
+        });
+    }
+
+    // ==========================================
+    // 登入與新增紀錄操作
+    // ==========================================
+    let loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+    let addRecordModal = new bootstrap.Modal(document.getElementById('addRecordModal'));
+
+    function showLoginModal() {
+        document.getElementById('loginAccount').value = '';
+        document.getElementById('loginPassword').value = '';
+        loginModal.show();
+    }
+
+    async function doLogin() {
+        let acc = document.getElementById('loginAccount').value;
+        let pwd = document.getElementById('loginPassword').value;
+        if(!acc) { alert("請輸入帳號"); return; }
+
+        let btn = document.querySelector('#loginModal .btn-primary');
+        btn.innerText = "驗證中...";
+        btn.disabled = true;
+
+        try {
+            let res = await fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'login', account: acc, password: pwd })
+            });
+            let result = await res.json();
+            
+            if(result.status === 'success') {
+                loginModal.hide();
+                initAddRecordForm();
+                addRecordModal.show();
+            } else {
+                alert(result.message);
+            }
+        } catch(e) {
+            alert("連線錯誤");
+        }
+        btn.innerText = "登入";
+        btn.disabled = false;
+    }
+
+    function initAddRecordForm() {
+        document.getElementById('recordMemo').value = '';
+        document.getElementById('playerInputsContainer').innerHTML = '';
+        document.getElementById('currentSum').innerText = '0';
+        document.getElementById('currentSum').className = 'text-primary';
+        for(let i=0; i<4; i++) addPlayerInputRow();
+    }
+
+    function addPlayerInputRow() {
+        let container = document.getElementById('playerInputsContainer');
+        let row = document.createElement('div');
+        row.className = "row mb-2 align-items-center player-input-row";
+        
+        let selectHtml = `<select class="form-select player-select"><option value="">選擇玩家</option>`;
+        availablePlayersForDropdown.forEach(p => { selectHtml += `<option value="${p}">${p}</option>`; });
+        selectHtml += `<option value="NEW_PLAYER">++新增其他玩家++</option></select>`;
+
+        row.innerHTML = `
+            <div class="col-5">${selectHtml}</div>
+            <div class="col-5"><input type="number" class="form-control amount-input" placeholder="金額 (贏正輸負)" oninput="calcSum()"></div>
+            <div class="col-2"><button type="button" class="btn btn-outline-danger btn-sm w-100" onclick="this.parentElement.parentElement.remove(); calcSum();">✖</button></div>
+        `;
+        
+        row.querySelector('.player-select').addEventListener('change', function() {
+            if(this.value === 'NEW_PLAYER') {
+                let newName = prompt("請輸入新玩家名稱：");
+                if(newName && newName.trim() !== "") {
+                    availablePlayersForDropdown.push(newName.trim());
+                    let option = new Option(newName.trim(), newName.trim(), true, true);
+                    this.add(option, this.options[this.options.length - 1]);
+                } else {
+                    this.value = "";
+                }
+            }
+        });
+
+        container.appendChild(row);
+    }
+
+    function calcSum() {
+        let sum = 0;
+        document.querySelectorAll('.amount-input').forEach(input => {
+            if(input.value !== "") sum += Number(input.value);
+        });
+        let sumEl = document.getElementById('currentSum');
+        sumEl.innerText = sum;
+        sumEl.className = sum === 0 ? "text-success fw-bold" : "text-danger fw-bold";
+    }
+
+    async function submitRecord() {
+        let date = document.getElementById('recordDate').value;
+        let memo = document.getElementById('recordMemo').value;
+        let players = [];
+        let rows = document.querySelectorAll('.player-input-row');
+        
+        let sum = 0;
+        let hasError = false;
+
+        rows.forEach(row => {
+            let name = row.querySelector('.player-select').value;
+            let amount = row.querySelector('.amount-input').value;
+            
+            if(name && amount !== "") {
+                players.push({ name: name, amount: Number(amount) });
+                sum += Number(amount);
+            } else if ((name && amount === "") || (!name && amount !== "")) {
+                hasError = true;
+            }
+        });
+
+        if(players.length === 0) { alert("請至少輸入一位玩家與金額！"); return; }
+        if(hasError) { alert("有選玩家就必須輸入金額，反之亦然！"); return; }
+        if(sum !== 0) { alert("防呆機制：金額總和必須為 0！ 目前總和為：" + sum); return; }
+
+        let btn = document.querySelector('#addRecordModal .btn-primary');
+        btn.innerText = "送出中...";
+        btn.disabled = true;
+
+        try {
+            let res = await fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'addRecord', date: date, memo: memo, players: players })
+            });
+            let result = await res.json();
+            
+            if(result.status === 'success') {
+                alert("新增成功！");
+                addRecordModal.hide();
+                fetchData(); 
+            } else {
+                alert(result.message);
+            }
+        } catch(e) {
+            alert("連線錯誤");
+        }
+        btn.innerText = "確認送出";
+        btn.disabled = false;
+    }
+</script>
+
+</body>
+</html>
