@@ -185,7 +185,6 @@
                 <div class="card shadow-sm">
                     <div class="card-body p-0">
                         <div class="p-2 text-center" style="background-color: #0B1120; border-bottom: 1px solid var(--border-color);">
-                            <!-- ★ 修改：取消 2025/11/1 的標示，表明是歷史所有紀錄統計 -->
                             <span class="text-muted small">💡 局數與勝率為<strong>歷史所有紀錄統計</strong> (贏為正值，輸為負值)</span>
                         </div>
                         <div class="leaderboard-container" style="height: calc(100vh - 215px);">
@@ -295,7 +294,6 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbyuhqtuSSZxMpQ7k0lnJvJk2dQbeRFMHcV9CUMXnSCm9KPJ-qRe7PUVv0NScnyJXwup/exec"; 
-    // ★ 移除 CUTOFF_DATE，所有計算統一以歷史全部數據為主
 
     let isLoggedIn = false;
     let allData = { players: [], records: [], hiddenPlayers: [] };
@@ -308,9 +306,6 @@
     let chartLegendState = {}; 
     let animInterval = null; 
     let hasPlayedInitialAnim = false; 
-    
-    let grandTotal = 0; 
-    let playerGrandTotal = 0; 
 
     function sortRecordsCore(records, ascending = true) {
         return records.sort((a, b) => {
@@ -371,11 +366,8 @@
 
     function processData() {
         playerStats = {};
-        grandTotal = 0; 
-        playerGrandTotal = 0;
         let hiddenSet = new Set(allData.hiddenPlayers || []);
         
-        // ★ 初始化，變更變數名稱以符合「全部歷史統計」的意義
         allData.players.forEach(p => { 
             playerStats[p] = { allTimeAmount: 0, games: 0, wins: 0, loses: 0, historySum: [0] }; 
         });
@@ -385,7 +377,6 @@
         let miscCount = 0;
 
         ascRecords.forEach(record => {
-            let recordDateObj = new Date(record.date.substring(0, 10));
             let isMatch = Object.values(record.scores).some(v => v !== null && v !== "");
             
             if (isMatch) {
@@ -400,7 +391,6 @@
                         let numScore = Number(score);
                         playerStats[p].allTimeAmount += numScore; 
                         
-                        // ★ 無論日期為何，只要有打就計入局數與勝負
                         playerStats[p].games += 1;
                         if (numScore > 0) playerStats[p].wins += 1;
                         else if (numScore < 0) playerStats[p].loses += 1;
@@ -569,21 +559,26 @@
 
         function getSeriesData(step) {
             if (mode === 'race') {
-                option.grid = { left: '3%', right: '15%', bottom: '5%', top: '15%', containLabel: true }; 
-                option.xAxis = { type: 'value', axisLabel: { color: '#CBD5E1' }, splitLine: { lineStyle: { color: '#1E293B', type: 'dashed' } } };
+                option.grid = { left: '15%', right: '15%', bottom: '5%', top: '15%', containLabel: true }; 
                 
-                // ★ 1. 抓取當下的資料並作真實「數學遞減排序」(最大正數最前，最小負數最後)
+                option.xAxis = { 
+                    type: 'value', 
+                    axisLabel: { color: '#CBD5E1' }, 
+                    splitLine: { lineStyle: { color: '#1E293B', type: 'dashed' } },
+                    // ★ 核心優化：智慧延展 X 軸，強迫向左右兩側多留出 2000 的空間，絕對不讓文字撞到邊界與 Y 軸！
+                    min: function(value) { return value.min >= 0 ? 0 : Math.floor(value.min / 1000) * 1000 - 2000; },
+                    max: function(value) { return value.max <= 0 ? 0 : Math.ceil(value.max / 1000) * 1000 + 2000; }
+                };
+                
                 let stepData = currentActivePlayers.map(p => {
                     return { name: p, value: playerStats[p].historySum[step - 1] };
                 });
                 stepData.sort((a, b) => b.value - a.value);
-
-                // ★ 2. 抽取出排序過的名字給 Y 軸
                 let sortedNames = stepData.map(item => item.name);
 
                 option.yAxis = { 
                     type: 'category', 
-                    inverse: true, // inverse: true 搭配上面的排序，會讓最大的正數(index 0)排在圖表最頂端
+                    inverse: true, 
                     data: sortedNames, 
                     axisLabel: { color: '#F8FAFC', fontSize: 13, fontWeight: 'bold', interval: 0 },
                     max: currentActivePlayers.length - 1,
@@ -604,35 +599,31 @@
                 
                 option.tooltip = { show: false };
 
-                // ★ 3. 準備長條圖的資料 (順序必須跟 Y 軸的 sortedNames 完全一致)
                 let raceData = stepData.map((item) => {
                     let originalIndex = sortedPlayers.indexOf(item.name);
+                    let val = item.value || 0;
+                    let isPos = val >= 0;
+                    
                     return {
                         name: item.name, 
-                        value: item.value,
-                        itemStyle: { color: colorPalette[originalIndex % colorPalette.length] }
+                        value: val,
+                        itemStyle: { color: colorPalette[originalIndex % colorPalette.length] },
+                        label: {
+                            show: true,
+                            position: isPos ? 'right' : 'left',    
+                            offset: isPos ? [5, 0] : [-5, 0],      
+                            valueAnimation: true,
+                            color: '#F8FAFC',
+                            fontSize: 14,
+                            fontWeight: 'bold',
+                            formatter: isPos ? ('+' + val + '  ' + item.name) : (item.name + '  ' + val)
+                        }
                     };
                 });
 
                 return [{
                     type: 'bar',
-                    // ★ 4. 關閉 realtimeSort！因為我們已經自己做了最準確的正負數學排序，不讓它插手
-                    data: raceData,
-                    label: {
-                        show: true, 
-                        position: function(params) {
-                            return params.value >= 0 ? 'right' : 'left';
-                        }, 
-                        valueAnimation: true,
-                        color: '#F8FAFC', 
-                        fontSize: 14, 
-                        fontWeight: 'bold',
-                        formatter: function(params) {
-                            let val = params.value || 0;
-                            let sign = val > 0 ? '+' : '';
-                            return sign + val + '  ' + params.name;
-                        } 
-                    }
+                    data: raceData
                 }];
             }
             else if (mode === '2d') {
@@ -715,7 +706,7 @@
             animInterval = setInterval(() => {
                 currentStep++;
                 myChart.setOption({
-                    yAxis: option.yAxis,        // ★ 手動排序時，每一幀都必須更新 Y 軸資料給 ECharts 知道
+                    yAxis: option.yAxis,        
                     series: getSeriesData(currentStep), 
                     title: option.title 
                 });
