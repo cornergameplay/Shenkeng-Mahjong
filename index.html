@@ -17,35 +17,50 @@
             --lime-green: #D9FF00;    
             --lime-hover: #bceb00;
             --cyan-glow: #00E5FF;
-            --text-light: #F8FAFC;
-            --text-muted: #94A3B8;
+            --text-light: #F8FAFC;    
+            --text-muted: #CBD5E1;    
             --win-color: #FF4D4F;     
-            --lose-color: #9CA3AF;    
+            --lose-color: #00ff88;    
             --border-color: #1E293B;  
         }
 
-        body { 
-            background-color: var(--bg-dark); color: var(--text-light);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; 
+        body, .card, .modal-content { 
+            background-color: var(--bg-dark); 
+            color: var(--text-light) !important;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            overflow: hidden; 
         }
+
+        .text-muted { color: var(--text-muted) !important; }
 
         .navbar { background-color: var(--bg-dark) !important; border-bottom: 1px solid var(--border-color); }
         .navbar-brand { font-weight: bold; color: var(--text-light) !important; }
         
-        .btn-lime { background-color: var(--lime-green); color: #000; font-weight: bold; border: none; }
-        .btn-lime:hover { background-color: var(--lime-hover); color: #000; }
-        .btn-outline-lime { border: 1px solid var(--lime-green); color: var(--lime-green); background: transparent; }
-        .btn-outline-lime:hover { background-color: var(--lime-green); color: #000; }
+        .btn-lime { background-color: var(--lime-green); color: #000 !important; font-weight: bold; border: none; }
+        .btn-lime:hover { background-color: var(--lime-hover); color: #000 !important; }
+        .btn-outline-lime { border: 1px solid var(--lime-green); color: var(--lime-green) !important; background: transparent; }
+        .btn-outline-lime:hover { background-color: var(--lime-green); color: #000 !important; }
         
-        .btn-outline-cyan { border: 1px solid var(--cyan-glow); color: var(--cyan-glow); background: transparent; }
-        .btn-outline-cyan:hover { background-color: var(--cyan-glow); color: #000; }
+        .btn-outline-cyan { border: 1px solid var(--cyan-glow); color: var(--cyan-glow) !important; background: transparent; }
+        .btn-outline-cyan:hover { background-color: var(--cyan-glow); color: #000 !important; }
 
         .card { background-color: var(--bg-card); border: 1px solid var(--border-color); }
-        .modal-content { background-color: var(--bg-card); color: var(--text-light); border: 1px solid var(--lime-green); }
+        .modal-content { background-color: var(--bg-card); color: var(--text-light) !important; border: 1px solid var(--lime-green); }
         .modal-header { border-bottom: 1px solid var(--border-color); }
         .modal-footer { border-top: 1px solid var(--border-color); }
-        .form-control, .form-select { background-color: var(--bg-dark); border: 1px solid var(--border-color); color: var(--text-light); }
-        .form-control:focus, .form-select:focus { background-color: var(--bg-dark); color: var(--text-light); border-color: var(--lime-green); box-shadow: 0 0 0 0.25rem rgba(217, 255, 0, 0.25); }
+        
+        .form-control, .form-select, option { 
+            background-color: var(--bg-dark) !important; 
+            color: var(--text-light) !important; 
+            border: 1px solid var(--border-color);
+        }
+        .form-control:focus, .form-select:focus { 
+            background-color: var(--bg-dark) !important; 
+            color: var(--text-light) !important; 
+            border-color: var(--lime-green) !important; 
+            box-shadow: 0 0 0 0.25rem rgba(217, 255, 0, 0.25) !important; 
+        }
+        ::placeholder { color: #64748B !important; opacity: 1 !important; }
 
         .win-text { color: var(--win-color) !important; font-weight: bold; } 
         .lose-text { color: var(--lose-color) !important; } 
@@ -56,14 +71,16 @@
         .nav-tabs .nav-link.active { background-color: transparent !important; color: var(--lime-green) !important; border-bottom: 3px solid var(--lime-green) !important; font-weight: bold; }
 
         .table-container { height: calc(100vh - 180px); overflow-x: auto; overflow-y: auto; }
-        table { color: var(--text-light) !important; white-space: nowrap; border-collapse: separate; border-spacing: 0; }
-        .table-bordered > :not(caption) > * > * { border-color: var(--border-color); }
-
-        #historyTable th, #historyTable td { color: var(--text-light) !important; }
+        
+        table, th, td { color: var(--text-light) !important; white-space: nowrap; border-collapse: separate; border-spacing: 0; }
+        .table-bordered > :not(caption) > * > * { border-color: var(--border-color) !important; }
+        
         #historyTable thead tr:nth-child(1) th { position: sticky; top: 0; background-color: var(--bg-dark) !important; z-index: 3; border-bottom: 2px solid var(--lime-green); }
         #historyTable thead tr:nth-child(2) th { position: sticky; top: 41px; background-color: #0B1120 !important; z-index: 3; font-size: 0.95rem; }
+        
         #historyTable th:nth-child(1), #historyTable td:nth-child(1) { position: sticky; left: 0; z-index: 2; }
         #historyTable th:nth-child(2), #historyTable td:nth-child(2) { position: sticky; left: 60px; z-index: 2; box-shadow: 3px 0 10px rgba(0,0,0,0.8); }
+        
         #historyTable thead tr:nth-child(1) th:nth-child(1), #historyTable thead tr:nth-child(1) th:nth-child(2) { z-index: 5; }
         #historyTable thead tr:nth-child(2) th:nth-child(1) { position: sticky; left: 0; z-index: 5; box-shadow: 3px 0 10px rgba(0,0,0,0.8); }
 
@@ -86,12 +103,20 @@
 
 <nav class="navbar shadow-sm">
     <div class="container-fluid">
-        <span class="navbar-brand mb-0 h1">🀄 好友麻將戰績系統</span>
-        <button class="btn btn-lime btn-sm" onclick="showLoginModal()">➕ 新增紀錄</button>
+        <span class="navbar-brand mb-0 h1">🀄 深坑麻將戰績紀錄</span>
+        <div class="d-flex align-items-center gap-2">
+            <span class="text-light fw-bold fs-5 d-none d-sm-block me-2" id="globalBalanceDisplay">目前金流: <span class="win-text">讀取中...</span></span>
+            <button class="btn btn-outline-danger btn-sm" id="logoutBtn" style="display: none;" onclick="doLogout()">🚪 登出</button>
+            <button class="btn btn-lime btn-sm" onclick="handleAddRecordClick()">➕ 新增紀錄</button>
+        </div>
     </div>
 </nav>
 
 <div class="container mt-3">
+    <div class="d-block d-sm-none mb-3 text-center rounded p-2" style="background-color: var(--bg-card); border: 1px solid var(--lime-green);">
+        <span class="text-light fw-bold fs-5" id="globalBalanceDisplayMobile">目前金流: <span class="win-text">讀取中...</span></span>
+    </div>
+
     <div id="loading" class="text-center my-5">
         <div class="spinner-border" role="status"></div>
         <p class="mt-2 text-muted">正在載入雲端數據庫...</p>
@@ -111,7 +136,6 @@
         </ul>
 
         <div class="tab-content" id="myTabContent">
-            <!-- 歷史紀錄 -->
             <div class="tab-pane fade show active" id="history" role="tabpanel">
                 <div class="card shadow-sm">
                     <div class="card-body p-0">
@@ -122,28 +146,34 @@
                 </div>
             </div>
 
-            <!-- 走勢圖 -->
             <div class="tab-pane fade" id="chart" role="tabpanel">
                 <div class="card shadow-sm">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
-                            <p class="text-muted small mb-0">💡 點擊圖例開關玩家(系統會記憶)。</p>
+                            <p class="text-muted small mb-0">💡 圖例開關點擊記憶。懸浮查看即時排名！</p>
                             <div class="d-flex gap-2 align-items-center flex-wrap">
                                 <button class="btn btn-outline-cyan btn-sm text-nowrap" id="playAnimBtn" onclick="renderChart(true)">▶️ 播放動畫</button>
-                                <select id="xAxisInterval" class="form-select form-select-sm" style="width: auto; background-color: var(--bg-dark); color: var(--lime-green); border-color: var(--lime-green);" onchange="renderChart(false)">
-                                    <option value="auto">X軸間距: 自動</option>
-                                    <option value="0">顯示每 1 局</option>
-                                    <option value="1">顯示每 2 局</option>
-                                    <option value="2">顯示每 3 局</option>
-                                    <option value="3">顯示每 4 局</option>
-                                    <option value="4">顯示每 5 局</option>
-                                    <option value="5">顯示每 6 局</option>
-                                    <option value="6">顯示每 7 局</option>
-                                    <option value="7">顯示每 8 局</option>
-                                    <option value="8">顯示每 9 局</option>
-                                    <option value="9">顯示每 10 局</option>
+                                
+                                <select id="animSpeedSelect" class="form-select form-select-sm" style="width: auto; background-color: var(--bg-dark); color: var(--text-light); border-color: var(--border-color);" onchange="handleSpeedChange()">
+                                    <option value="auto">速度: 自動</option>
+                                    <option value="800">速度: 慢</option>
+                                    <option value="300">速度: 中</option>
+                                    <option value="100">速度: 快</option>
                                 </select>
-                                <button class="btn btn-outline-lime btn-sm text-nowrap" id="toggleChartBtn" onclick="toggleChartMode()">切換為 3D 視角</button>
+
+                                <select id="xAxisInterval" class="form-select form-select-sm" style="width: auto; background-color: var(--bg-dark); color: var(--text-light); border-color: var(--border-color);" onchange="renderChart(false)">
+                                    <option value="auto">X軸: 自動</option>
+                                    <option value="0">X軸: 1局</option>
+                                    <option value="1">X軸: 2局</option>
+                                    <option value="4">X軸: 5局</option>
+                                    <option value="9">X軸: 10局</option>
+                                </select>
+                                
+                                <select id="chartModeSelect" class="form-select form-select-sm fw-bold" style="width: auto; background-color: var(--bg-dark); color: var(--lime-green); border-color: var(--lime-green);" onchange="renderChart(false)">
+                                    <option value="2d">📈 2D 折線圖</option>
+                                    <option value="race">🏁 動態賽跑圖</option>
+                                    <option value="3d">🧊 3D 折線圖</option>
+                                </select>
                             </div>
                         </div>
                         <div class="chart-container" id="myChart"></div>
@@ -151,11 +181,14 @@
                 </div>
             </div>
 
-            <!-- 勝率榜 -->
             <div class="tab-pane fade" id="leaderboard" role="tabpanel">
                 <div class="card shadow-sm">
                     <div class="card-body p-0">
-                        <div class="leaderboard-container">
+                        <div class="p-2 text-center" style="background-color: #0B1120; border-bottom: 1px solid var(--border-color);">
+                            <!-- ★ 修改：取消 2025/11/1 的標示，表明是歷史所有紀錄統計 -->
+                            <span class="text-muted small">💡 局數與勝率為<strong>歷史所有紀錄統計</strong> (贏為正值，輸為負值)</span>
+                        </div>
+                        <div class="leaderboard-container" style="height: calc(100vh - 215px);">
                             <table class="table text-center mb-0">
                                 <thead>
                                     <tr>
@@ -178,7 +211,7 @@
     </div>
 </div>
 
-<!-- 登入與新增 Modal (結構維持不變) -->
+<!-- 登入 Modal -->
 <div class="modal fade" id="loginModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -203,28 +236,56 @@
     </div>
 </div>
 
+<!-- 新增紀錄 Modal -->
 <div class="modal fade" id="addRecordModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" style="color: var(--lime-green)">➕ 寫入對戰紀錄</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            <div class="modal-header d-flex justify-content-between align-items-center">
+                <h5 class="modal-title mb-0" style="color: var(--lime-green)">➕ 寫入紀錄</h5>
+                
+                <select class="form-select form-select-sm w-auto mx-3 fw-bold d-none" id="recordTypeSelect" onchange="toggleRecordMode()">
+                    <option value="match">對戰紀錄 (打牌)</option>
+                    <option value="misc">純雜支紀錄 (收支)</option>
+                </select>
+
+                <button type="button" class="btn-close btn-close-white m-0" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <div class="row mb-3">
-                    <div class="col-6"><label class="form-label text-muted">日期</label><input type="date" class="form-control" id="recordDate"></div>
-                    <div class="col-6"><label class="form-label text-muted">備註</label><input type="text" class="form-control" id="recordMemo" placeholder="例如：打300/100"></div>
+                    <div class="col-6"><label class="form-label text-muted">日期 (請依格式)</label><input type="date" class="form-control" id="recordDate"></div>
+                    <div class="col-6"><label class="form-label text-muted">備註</label><input type="text" class="form-control" id="recordMemo" placeholder="例如: 地點 / 項目"></div>
                 </div>
                 <hr style="border-color: var(--border-color);">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h6 class="mb-0 text-light">參賽人員與金額 (總和須為0)</h6>
-                    <button class="btn btn-sm btn-outline-lime" onclick="addPlayerInputRow()">+ 新增人員</button>
+                
+                <div id="matchModeArea">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0 text-light">參賽人員與金額 <span style="color: var(--win-color);">(總和必須為 0)</span></h6>
+                        <button class="btn btn-sm btn-outline-lime" onclick="addPlayerInputRow()">+ 新增人員</button>
+                    </div>
+                    
+                    <div class="row mb-3 align-items-center d-none">
+                        <div class="col-5 text-end text-muted small">該局若有額外雜支 ➔</div>
+                        <div class="col-5"><input type="number" class="form-control" id="recordMatchMisc" placeholder="支出為負 / 收入為正"></div>
+                        <div class="col-2"></div>
+                    </div>
+                    <div id="playerInputsContainer"></div>
                 </div>
-                <div id="playerInputsContainer"></div>
-                <div class="text-end mt-3 fw-bold fs-5">目前總和：<span id="currentSum" class="text-light">0</span></div>
+
+                <div id="miscModeArea" style="display: none;">
+                    <div class="alert text-center mb-0" style="background-color: rgba(0, 229, 255, 0.1); border: 1px solid var(--cyan-glow);">
+                        <h6 style="color: var(--cyan-glow)">💰 專屬純雜支紀錄區</h6>
+                        <p class="text-muted small mb-2">此紀錄僅影響公積金餘額，不列入玩家勝率或局數</p>
+                        <div class="d-flex justify-content-center">
+                            <div class="w-75">
+                                <input type="number" class="form-control form-control-lg text-center fw-bold" id="recordPureMisc" placeholder="金額 (支出負 / 收入正)">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
             <div class="modal-footer border-0">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-secondary" style="color: #fff !important;" data-bs-dismiss="modal">取消</button>
                 <button type="button" class="btn btn-lime" onclick="submitRecord()">確認送出</button>
             </div>
         </div>
@@ -233,19 +294,37 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbyaqTfTnxfAQuaiUi8UhkvgWjmLz6_U9mzKp0kp3PNzNzBEKwuB69sC6hnJhlN8QLWx/exec";
-    
-    let allData = { players: [], records: [] };
+    const API_URL = "https://script.google.com/macros/s/AKfycbyuhqtuSSZxMpQ7k0lnJvJk2dQbeRFMHcV9CUMXnSCm9KPJ-qRe7PUVv0NScnyJXwup/exec"; 
+    // ★ 移除 CUTOFF_DATE，所有計算統一以歷史全部數據為主
+
+    let isLoggedIn = false;
+    let allData = { players: [], records: [], hiddenPlayers: [] };
     let playerStats = {};
     let sortedPlayers = [];
     let availablePlayersForDropdown = [];
     let currentSortBy = 'rate';
-    
     let myChart = null;
-    let is3DMode = false;
+    let lastChartMode = null; 
     let chartLegendState = {}; 
     let animInterval = null; 
     let hasPlayedInitialAnim = false; 
+    
+    let grandTotal = 0; 
+    let playerGrandTotal = 0; 
+
+    function sortRecordsCore(records, ascending = true) {
+        return records.sort((a, b) => {
+            let dateA = new Date(a.date.substring(0, 10)).getTime();
+            let dateB = new Date(b.date.substring(0, 10)).getTime();
+            
+            let isMatchA = Object.values(a.scores).some(v => v !== null && v !== "");
+            let isMatchB = Object.values(b.scores).some(v => v !== null && v !== "");
+
+            if (dateA !== dateB) return ascending ? (dateA - dateB) : (dateB - dateA);
+            if (isMatchA !== isMatchB) return isMatchA ? -1 : 1; 
+            return ascending ? (a.id - b.id) : (b.id - a.id);
+        });
+    }
 
     const colorPalette = ['#D9FF00', '#00E5FF', '#FF0055', '#FFaa00', '#00ff88', '#B700FF', '#FF00CC', '#0088FF', '#FFff00', '#FF3300'];
 
@@ -281,34 +360,79 @@
             let result = await res.json();
             if(result.data) {
                 allData = result.data;
-                availablePlayersForDropdown = [...allData.players];
+                let hiddenSet = new Set(allData.hiddenPlayers || []);
+                availablePlayersForDropdown = [...allData.players].filter(p => !hiddenSet.has(p));
                 processData();
             }
-        } catch (error) { alert("資料載入失敗，請檢查網路連線。"); }
+        } catch (error) { alert("資料載入失敗，請檢查連線。"); }
         document.getElementById('loading').style.display = 'none';
         document.getElementById('mainContent').style.display = 'block';
     }
 
     function processData() {
         playerStats = {};
-        allData.players.forEach(p => { playerStats[p] = { games: 0, wins: 0, loses: 0, totalAmount: 0, historySum: [0] }; });
-        let sortedRecords = [...allData.records].sort((a,b) => a.id - b.id);
-        sortedRecords.forEach(record => {
-            allData.players.forEach(p => {
-                let score = record.scores[p];
-                let lastSum = playerStats[p].historySum[playerStats[p].historySum.length - 1];
-                if (score !== null && score !== "") {
-                    let numScore = Number(score);
-                    playerStats[p].games += 1;
-                    if (numScore >= 0) playerStats[p].wins += 1; else playerStats[p].loses += 1;
-                    playerStats[p].totalAmount += numScore;
-                    playerStats[p].historySum.push(lastSum + numScore);
-                } else playerStats[p].historySum.push(lastSum);
-            });
+        grandTotal = 0; 
+        playerGrandTotal = 0;
+        let hiddenSet = new Set(allData.hiddenPlayers || []);
+        
+        // ★ 初始化，變更變數名稱以符合「全部歷史統計」的意義
+        allData.players.forEach(p => { 
+            playerStats[p] = { allTimeAmount: 0, games: 0, wins: 0, loses: 0, historySum: [0] }; 
         });
-        sortedPlayers = [...allData.players].sort((a, b) => playerStats[b].games - playerStats[a].games);
+
+        let ascRecords = sortRecordsCore([...allData.records], true);
+        let matchCount = 0;
+        let miscCount = 0;
+
+        ascRecords.forEach(record => {
+            let recordDateObj = new Date(record.date.substring(0, 10));
+            let isMatch = Object.values(record.scores).some(v => v !== null && v !== "");
+            
+            if (isMatch) {
+                matchCount++;
+                record.displayId = matchCount;
+
+                allData.players.forEach(p => {
+                    let score = record.scores[p];
+                    let lastSum = playerStats[p].historySum[playerStats[p].historySum.length - 1];
+                    
+                    if (score !== null && score !== "") {
+                        let numScore = Number(score);
+                        playerStats[p].allTimeAmount += numScore; 
+                        
+                        // ★ 無論日期為何，只要有打就計入局數與勝負
+                        playerStats[p].games += 1;
+                        if (numScore > 0) playerStats[p].wins += 1;
+                        else if (numScore < 0) playerStats[p].loses += 1;
+
+                        playerStats[p].historySum.push(lastSum + numScore);
+                    } else {
+                        playerStats[p].historySum.push(lastSum);
+                    }
+                });
+            } else {
+                miscCount++;
+                record.displayId = "雜支" + miscCount;
+            }
+        });
+        
+        let currentCashFlow = 0;
+        allData.players.forEach(p => {
+            if (playerStats[p].allTimeAmount > 0) {
+                currentCashFlow += playerStats[p].allTimeAmount;
+            }
+        });
+        
+        let balanceHtml = `目前金流: <span class="win-text" style="font-size: 1.1em;">+${currentCashFlow.toLocaleString()}</span>`;
+        document.getElementById('globalBalanceDisplay').innerHTML = balanceHtml;
+        document.getElementById('globalBalanceDisplayMobile').innerHTML = balanceHtml;
+
+        sortedPlayers = [...allData.players].filter(p => !hiddenSet.has(p));
+        
         if (Object.keys(chartLegendState).length === 0) sortedPlayers.forEach(p => { chartLegendState[p] = true; });
+        
         renderHistory();
+        allData.sortedAscRecords = ascRecords; 
         renderChart(false); 
         sortLeaderboard(currentSortBy);
     }
@@ -321,17 +445,36 @@
     }
 
     function renderHistory() {
-        let thead = `<thead><tr><th style="width: 60px; min-width: 60px;">局數</th><th style="width: 110px; min-width: 110px;">日期</th>`;
+        let thead = `<thead><tr>
+            <th style="width: 65px; min-width: 65px;">局數</th>
+            <th style="width: 110px; min-width: 110px;">日期</th>
+            <th style="min-width:120px;">備註</th>
+            <th style="display:none;">雜支</th>
+            <th style="display:none;">累積總額</th>`;
         sortedPlayers.forEach(p => { thead += `<th>${p}</th>`; });
-        thead += `<th style="min-width:120px;">備註</th></tr><tr><th colspan="2" class="text-end text-muted" style="color: var(--lime-green) !important;">累積金額 ➔</th>`;
-        sortedPlayers.forEach(p => { thead += `<th>${formatMoney(playerStats[p].totalAmount)}</th>`; });
-        thead += `<th>-</th></tr></thead>`;
+        thead += `</tr>
+            <tr><th colspan="2" class="text-end text-muted" style="color: var(--lime-green) !important;">玩家總結 ➔</th>
+            <th>-</th>
+            <th style="display:none;">-</th>
+            <th style="display:none;">-</th>`;
+        sortedPlayers.forEach(p => { thead += `<th>${formatMoney(playerStats[p].allTimeAmount)}</th>`; });
+        thead += `</tr></thead>`;
+        
         let tbody = `<tbody>`;
-        let reverseRecords = [...allData.records].sort((a,b) => b.id - a.id);
-        reverseRecords.forEach(r => {
-            tbody += `<tr><td>${r.id}</td><td style="color: var(--text-muted) !important;">${r.date.substring(0,10)}</td>`;
+        let descRecords = sortRecordsCore([...allData.records], false);
+        
+        descRecords.forEach((r) => {
+            let isMiscType = typeof r.displayId === 'string' && r.displayId.includes("雜支");
+            let idColor = isMiscType ? `color: var(--cyan-glow) !important; font-size: 0.9em;` : ``;
+            
+            tbody += `<tr>
+                <td style="${idColor}">${r.displayId}</td>
+                <td style="color: var(--text-muted) !important;">${r.date.substring(0,10)}</td>
+                <td style="color: var(--text-muted) !important;">${r.memo}</td>
+                <td style="display:none;">-</td>
+                <td style="display:none;">-</td>`;
             sortedPlayers.forEach(p => { tbody += `<td>${formatMoney(r.scores[p])}</td>`; });
-            tbody += `<td style="color: var(--text-muted) !important;">${r.memo}</td></tr>`;
+            tbody += `</tr>`;
         });
         tbody += `</tbody>`;
         document.getElementById('historyTable').innerHTML = thead + tbody;
@@ -339,53 +482,75 @@
 
     function sortLeaderboard(sortBy) {
         currentSortBy = sortBy;
-        let rankPlayers = [...sortedPlayers].filter(p => playerStats[p].games > 0);
+        let rankPlayers = [...sortedPlayers].filter(p => playerStats[p].allTimeAmount !== 0 || playerStats[p].games > 0);
+        
         rankPlayers.sort((a, b) => {
-            let rateA = playerStats[a].wins / playerStats[a].games;
-            let rateB = playerStats[b].wins / playerStats[b].games;
+            let rateA = playerStats[a].games > 0 ? (playerStats[a].wins / playerStats[a].games) : 0;
+            let rateB = playerStats[b].games > 0 ? (playerStats[b].wins / playerStats[b].games) : 0;
+            
             if (sortBy === 'rate') {
                 if (rateB !== rateA) return rateB - rateA;
                 return playerStats[b].games - playerStats[a].games; 
-            } else if (sortBy === 'amount') return playerStats[b].totalAmount - playerStats[a].totalAmount;
+            } else if (sortBy === 'amount') return playerStats[b].allTimeAmount - playerStats[a].allTimeAmount;
             else if (sortBy === 'games') return playerStats[b].games - playerStats[a].games;
             else if (sortBy === 'wins') return playerStats[b].wins - playerStats[a].wins;
             else if (sortBy === 'loses') return playerStats[b].loses - playerStats[a].loses;
         });
+        
         let html = '';
         rankPlayers.forEach((p, index) => {
-            let winRate = ((playerStats[p].wins / playerStats[p].games) * 100).toFixed(1);
+            let winRate = playerStats[p].games > 0 ? ((playerStats[p].wins / playerStats[p].games) * 100).toFixed(1) : "0.0";
             let medal = index === 0 ? "🥇 " : index === 1 ? "🥈 " : index === 2 ? "🥉 " : "";
-            html += `<tr><td>${medal}${index + 1}</td><td class="fw-bold">${p}</td><td class="fw-bold" style="color: var(--lime-green)">${winRate}%</td><td>${formatMoney(playerStats[p].totalAmount)}</td><td>${playerStats[p].games}</td><td>${playerStats[p].wins}</td><td>${playerStats[p].loses}</td></tr>`;
+            html += `<tr>
+                <td>${medal}${index + 1}</td>
+                <td class="fw-bold">${p}</td>
+                <td class="fw-bold" style="color: var(--lime-green)">${winRate}%</td>
+                <td>${formatMoney(playerStats[p].allTimeAmount)}</td>
+                <td>${playerStats[p].games}</td>
+                <td>${playerStats[p].wins}</td>
+                <td>${playerStats[p].loses}</td>
+            </tr>`;
         });
         document.getElementById('leaderboardTableBody').innerHTML = html;
     }
 
-    function toggleChartMode() {
-        is3DMode = !is3DMode;
-        document.getElementById('toggleChartBtn').innerText = is3DMode ? "切換為 2D 視角" : "切換為 3D 視角";
-        renderChart(false);
+    function handleSpeedChange() {
+        if (animInterval) {
+            renderChart(true); 
+        }
     }
 
     function renderChart(isPlayback = false) {
+        let mode = document.getElementById('chartModeSelect').value;
         let chartDom = document.getElementById('myChart');
-        if(myChart) myChart.dispose(); 
-        myChart = echarts.init(chartDom);
-        if(animInterval) clearInterval(animInterval);
+        
+        if (!myChart || lastChartMode !== mode) {
+            if(myChart) myChart.dispose(); 
+            myChart = echarts.init(chartDom);
+            lastChartMode = mode;
+        }
+        
+        if(animInterval) { clearInterval(animInterval); animInterval = null; }
         
         let labels = ["起始"];
-        let sortedRecords = [...allData.records].sort((a,b) => a.id - b.id);
-        for(let i = 1; i <= sortedRecords.length; i++) labels.push(i);
+        let matchDates = [""];
+        let matchOnlyRecords = allData.sortedAscRecords.filter(r => Object.values(r.scores).some(v => v !== null && v !== ""));
+        for(let i = 1; i <= matchOnlyRecords.length; i++) {
+            labels.push(i);
+            matchDates.push(matchOnlyRecords[i-1].date.substring(0, 10)); 
+        }
+        
         let totalSteps = labels.length;
 
-        let activePlayers = sortedPlayers.filter(p => playerStats[p].games > 0);
+        let activePlayers = sortedPlayers.filter(p => playerStats[p].allTimeAmount !== 0 || playerStats[p].games > 0);
+        let currentActivePlayers = activePlayers.filter(p => chartLegendState[p] !== false);
+
         let intervalVal = document.getElementById('xAxisInterval').value;
         let axisInterval = intervalVal === 'auto' ? 'auto' : parseInt(intervalVal);
         
-        // 【優化點2：平滑動畫引擎設定】
-        let speed = Math.max(100, Math.min(300, 3000 / totalSteps)); // 計算最完美的播放過場速度
+        let speedVal = document.getElementById('animSpeedSelect').value;
+        let speed = speedVal === 'auto' ? Math.max(100, Math.min(300, 3000 / totalSteps)) : parseInt(speedVal);
         
-        // 【優化點1：Y軸比例強制6000倍數】
-        // 數學邏輯：無條件進位/捨去至最近的6000
         let yAxisMinMaxRule = {
             max: function (value) { let t = Math.ceil(value.max / 6000) * 6000; return t === 0 ? 6000 : t; },
             min: function (value) { let t = Math.floor(value.min / 6000) * 6000; return t === 0 ? -6000 : t; }
@@ -394,63 +559,146 @@
         let option = {
             backgroundColor: 'transparent',
             color: colorPalette,
-            // 啟用線性過場動畫，讓線條順暢滑過去
             animation: true,
             animationDuration: isPlayback ? speed : 800,
             animationDurationUpdate: isPlayback ? speed : 800,
             animationEasing: 'linear',
             animationEasingUpdate: 'linear',
-            tooltip: { backgroundColor: '#131B2F', borderColor: '#D9FF00', textStyle: { color: '#F8FAFC' } },
-            legend: { data: activePlayers, selected: chartLegendState, textStyle: { color: '#94A3B8' }, top: 0 }
+            legend: { data: activePlayers, selected: chartLegendState, textStyle: { color: '#CBD5E1' }, top: 0, type: 'scroll' }
         };
 
         function getSeriesData(step) {
-            if (!is3DMode) {
-                option.tooltip.trigger = 'axis';
-                option.grid = { left: '3%', right: '4%', bottom: '3%', containLabel: true };
-                option.xAxis = { type: 'category', boundaryGap: false, data: labels, axisLabel: { color: '#94A3B8', interval: axisInterval }, axisLine: { lineStyle: { color: '#1E293B' } } };
+            if (mode === 'race') {
+                option.grid = { left: '3%', right: '15%', bottom: '5%', top: '15%', containLabel: true }; 
+                option.xAxis = { type: 'value', axisLabel: { color: '#CBD5E1' }, splitLine: { lineStyle: { color: '#1E293B', type: 'dashed' } } };
                 
-                // 套用 Y軸 6000 的倍數級距與強制計算
+                // ★ 1. 抓取當下的資料並作真實「數學遞減排序」(最大正數最前，最小負數最後)
+                let stepData = currentActivePlayers.map(p => {
+                    return { name: p, value: playerStats[p].historySum[step - 1] };
+                });
+                stepData.sort((a, b) => b.value - a.value);
+
+                // ★ 2. 抽取出排序過的名字給 Y 軸
+                let sortedNames = stepData.map(item => item.name);
+
                 option.yAxis = { 
-                    type: 'value', 
-                    interval: 6000, 
-                    max: yAxisMinMaxRule.max, 
-                    min: yAxisMinMaxRule.min,
-                    axisLabel: { color: '#94A3B8' }, 
-                    splitLine: { lineStyle: { color: '#1E293B', type: 'dashed' } } 
+                    type: 'category', 
+                    inverse: true, // inverse: true 搭配上面的排序，會讓最大的正數(index 0)排在圖表最頂端
+                    data: sortedNames, 
+                    axisLabel: { color: '#F8FAFC', fontSize: 13, fontWeight: 'bold', interval: 0 },
+                    max: currentActivePlayers.length - 1,
+                    axisLine: { show: false },
+                    axisTick: { show: false },
+                    animationDuration: 300,
+                    animationDurationUpdate: 300
                 };
                 
-                return activePlayers.map((p, index) => {
+                let currentRoundStr = '局數: ' + labels[step - 1];
+                let dateStr = matchDates[step - 1] ? '  (' + matchDates[step - 1] + ')' : '';
+                option.title = {
+                    text: currentRoundStr + dateStr,
+                    right: '5%',
+                    bottom: '10%',
+                    textStyle: { color: 'rgba(217, 255, 0, 0.4)', fontSize: 32, fontWeight: 'bold' } 
+                };
+                
+                option.tooltip = { show: false };
+
+                // ★ 3. 準備長條圖的資料 (順序必須跟 Y 軸的 sortedNames 完全一致)
+                let raceData = stepData.map((item) => {
+                    let originalIndex = sortedPlayers.indexOf(item.name);
+                    return {
+                        name: item.name, 
+                        value: item.value,
+                        itemStyle: { color: colorPalette[originalIndex % colorPalette.length] }
+                    };
+                });
+
+                return [{
+                    type: 'bar',
+                    // ★ 4. 關閉 realtimeSort！因為我們已經自己做了最準確的正負數學排序，不讓它插手
+                    data: raceData,
+                    label: {
+                        show: true, 
+                        position: function(params) {
+                            return params.value >= 0 ? 'right' : 'left';
+                        }, 
+                        valueAnimation: true,
+                        color: '#F8FAFC', 
+                        fontSize: 14, 
+                        fontWeight: 'bold',
+                        formatter: function(params) {
+                            let val = params.value || 0;
+                            let sign = val > 0 ? '+' : '';
+                            return sign + val + '  ' + params.name;
+                        } 
+                    }
+                }];
+            }
+            else if (mode === '2d') {
+                option.title = { show: false };
+                option.tooltip = {
+                    trigger: 'axis',
+                    confine: true,         
+                    appendToBody: true,    
+                    backgroundColor: '#131B2F',
+                    borderColor: '#D9FF00',
+                    textStyle: { color: '#F8FAFC' },
+                    formatter: function (params) {
+                        let sortedParams = [...params].sort((a, b) => b.data - a.data);
+                        let dateText = matchDates[params[0].dataIndex] ? ` (${matchDates[params[0].dataIndex]})` : '';
+                        let html = `<div style="font-weight:bold; border-bottom:1px solid #1E293B; padding-bottom:6px; margin-bottom:6px;">局數：${sortedParams[0].axisValue}${dateText} (即時排名)</div>`;
+                        sortedParams.forEach(p => {
+                            let sign = p.data > 0 ? '+' : '';
+                            html += `<div style="display:flex; justify-content:space-between; margin-bottom: 2px;">
+                                <span>${p.marker} ${p.seriesName}</span>
+                                <span style="font-weight:bold; color:#F8FAFC; margin-left: 20px;">${sign}${p.data}</span>
+                            </div>`;
+                        });
+                        return html;
+                    }
+                };
+                option.grid = { left: '3%', right: '4%', bottom: '3%', containLabel: true };
+                option.xAxis = { type: 'category', boundaryGap: false, data: labels, axisLabel: { color: '#CBD5E1', interval: axisInterval }, axisLine: { lineStyle: { color: '#1E293B' } } };
+                option.yAxis = { type: 'value', interval: 6000, max: yAxisMinMaxRule.max, min: yAxisMinMaxRule.min, axisLabel: { color: '#CBD5E1' }, splitLine: { lineStyle: { color: '#1E293B', type: 'dashed' } } };
+                
+                return currentActivePlayers.map((p) => {
+                    let originalIndex = sortedPlayers.indexOf(p);
                     return {
                         name: p, type: 'line', smooth: false, showSymbol: false,
-                        lineStyle: { width: 3, shadowColor: colorPalette[index % colorPalette.length], shadowBlur: 10 },
-                        areaStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: colorPalette[index % colorPalette.length] }, { offset: 1, color: 'rgba(0,0,0,0)' }]), opacity: 0.1 },
+                        lineStyle: { width: 3, shadowColor: colorPalette[originalIndex % colorPalette.length], shadowBlur: 10 },
+                        areaStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: colorPalette[originalIndex % colorPalette.length] }, { offset: 1, color: 'rgba(0,0,0,0)' }]), opacity: 0.1 },
                         data: playerStats[p].historySum.slice(0, step)
                     };
                 });
-            } else {
+            } 
+            else {
+                option.title = { show: false };
+                option.tooltip = { 
+                    backgroundColor: '#131B2F', 
+                    borderColor: '#D9FF00', 
+                    textStyle: { color: '#F8FAFC' },
+                    confine: true, 
+                    appendToBody: true 
+                };
                 option.grid3D = {
                     boxWidth: 200, boxDepth: 120, boxHeight: 80,
-                    viewControl: { projection: 'perspective', autoRotate: true, autoRotateSpeed: 10, distance: 250 },
-                    axisLine: { lineStyle: { color: '#94A3B8' } }, splitLine: { lineStyle: { color: '#1E293B' } }, axisPointer: { lineStyle: { color: '#D9FF00' } }
+                    viewControl: { projection: 'perspective', autoRotate: false, distance: 250 },
+                    axisLine: { lineStyle: { color: '#CBD5E1' } }, splitLine: { lineStyle: { color: '#1E293B' } }, axisPointer: { lineStyle: { color: '#D9FF00' } }
                 };
                 option.xAxis3D = { type: 'category', data: labels, name: '將數', nameTextStyle: { color: '#F8FAFC' }, axisLabel: { interval: axisInterval } };
-                option.yAxis3D = { type: 'category', data: activePlayers, name: '玩家', nameTextStyle: { color: '#F8FAFC' } };
+                option.yAxis3D = { type: 'category', data: currentActivePlayers, name: '玩家', nameTextStyle: { color: '#F8FAFC' }, axisLabel: { interval: 0 } };
+                option.zAxis3D = { type: 'value', name: '金額', nameTextStyle: { color: '#F8FAFC' }, interval: 6000, max: yAxisMinMaxRule.max, min: yAxisMinMaxRule.min };
                 
-                // 3D Z軸同樣套用 6000 的倍數級距
-                option.zAxis3D = { 
-                    type: 'value', name: '金額', nameTextStyle: { color: '#F8FAFC' },
-                    interval: 6000, max: yAxisMinMaxRule.max, min: yAxisMinMaxRule.min
-                };
-                
-                return activePlayers.map((p, index) => {
+                return currentActivePlayers.map((p) => {
+                    let originalIndex = sortedPlayers.indexOf(p);
                     let pData = playerStats[p].historySum.slice(0, step).map((amount, roundIndex) => {
                         return [labels[roundIndex], p, amount];
                     });
                     return {
                         name: p, type: 'line3D', data: pData,
-                        lineStyle: { width: 4, color: colorPalette[index % colorPalette.length] },
-                        itemStyle: { color: colorPalette[index % colorPalette.length] }
+                        lineStyle: { width: 4, color: colorPalette[originalIndex % colorPalette.length] },
+                        itemStyle: { color: colorPalette[originalIndex % colorPalette.length] }
                     };
                 });
             }
@@ -462,11 +710,15 @@
             if(playBtn) { playBtn.disabled = true; playBtn.innerText = "⏳ 播放中..."; }
             let currentStep = 1; 
             option.series = getSeriesData(currentStep);
-            myChart.setOption(option);
+            myChart.setOption(option, true); 
             
             animInterval = setInterval(() => {
                 currentStep++;
-                myChart.setOption({ series: getSeriesData(currentStep) });
+                myChart.setOption({
+                    yAxis: option.yAxis,        // ★ 手動排序時，每一幀都必須更新 Y 軸資料給 ECharts 知道
+                    series: getSeriesData(currentStep), 
+                    title: option.title 
+                });
                 
                 if(currentStep >= totalSteps) {
                     clearInterval(animInterval);
@@ -477,18 +729,37 @@
 
         } else {
             option.series = getSeriesData(totalSteps);
-            myChart.setOption(option);
+            myChart.setOption(option, true);
             if(playBtn) { playBtn.disabled = false; playBtn.innerText = "▶️ 播放動畫"; }
         }
 
         myChart.on('legendselectchanged', function (params) {
             chartLegendState = params.selected;
+            if (mode === 'race') {
+                renderChart(false);
+            }
         });
     }
 
     let loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
     let addRecordModal = new bootstrap.Modal(document.getElementById('addRecordModal'));
-    function showLoginModal() { document.getElementById('loginAccount').value = ''; document.getElementById('loginPassword').value = ''; loginModal.show(); }
+    
+    function handleAddRecordClick() {
+        if (isLoggedIn) {
+            initAddRecordForm();
+            addRecordModal.show();
+        } else {
+            document.getElementById('loginAccount').value = ''; 
+            document.getElementById('loginPassword').value = ''; 
+            loginModal.show();
+        }
+    }
+
+    function doLogout() {
+        isLoggedIn = false;
+        document.getElementById('logoutBtn').style.display = 'none';
+        alert("已成功登出系統，下次新增紀錄需重新驗證。");
+    }
     
     async function doLogin() {
         let acc = document.getElementById('loginAccount').value;
@@ -499,14 +770,36 @@
         try {
             let res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'login', account: acc, password: pwd }) });
             let result = await res.json();
-            if(result.status === 'success') { loginModal.hide(); initAddRecordForm(); addRecordModal.show(); } else alert(result.message);
+            if(result.status === 'success') { 
+                isLoggedIn = true;
+                document.getElementById('logoutBtn').style.display = 'inline-block';
+                loginModal.hide(); 
+                initAddRecordForm(); 
+                addRecordModal.show(); 
+            } else alert(result.message);
         } catch(e) { alert("連線錯誤"); }
         btn.innerText = "登入"; btn.disabled = false;
     }
 
+    function toggleRecordMode() {
+        let mode = document.getElementById('recordTypeSelect').value;
+        if (mode === 'match') {
+            document.getElementById('matchModeArea').style.display = 'block';
+            document.getElementById('miscModeArea').style.display = 'none';
+        } else {
+            document.getElementById('matchModeArea').style.display = 'none';
+            document.getElementById('miscModeArea').style.display = 'block';
+        }
+    }
+
     function initAddRecordForm() {
-        document.getElementById('recordMemo').value = ''; document.getElementById('playerInputsContainer').innerHTML = '';
-        document.getElementById('currentSum').innerText = '0'; document.getElementById('currentSum').style.color = "var(--lime-green)";
+        document.getElementById('recordMemo').value = ''; 
+        document.getElementById('recordMatchMisc').value = ''; 
+        document.getElementById('recordPureMisc').value = ''; 
+        document.getElementById('recordTypeSelect').value = 'match';
+        toggleRecordMode();
+
+        document.getElementById('playerInputsContainer').innerHTML = '';
         for(let i=0; i<4; i++) addPlayerInputRow();
     }
 
@@ -517,7 +810,8 @@
         let selectHtml = `<select class="form-select player-select"><option value="">選擇玩家</option>`;
         availablePlayersForDropdown.forEach(p => { selectHtml += `<option value="${p}">${p}</option>`; });
         selectHtml += `<option value="NEW_PLAYER">++新增其他玩家++</option></select>`;
-        row.innerHTML = `<div class="col-5">${selectHtml}</div><div class="col-5"><input type="number" class="form-control amount-input" placeholder="金額 (贏正輸負)" oninput="calcSum()"></div><div class="col-2"><button type="button" class="btn btn-outline-danger btn-sm w-100" onclick="this.parentElement.parentElement.remove(); calcSum();">✖</button></div>`;
+        
+        row.innerHTML = `<div class="col-5">${selectHtml}</div><div class="col-5"><input type="number" class="form-control amount-input" placeholder="金額 (贏正/輸負)"></div><div class="col-2"><button type="button" class="btn btn-outline-danger btn-sm w-100" onclick="this.parentElement.parentElement.remove();">✖</button></div>`;
         row.querySelector('.player-select').addEventListener('change', function() {
             if(this.value === 'NEW_PLAYER') {
                 let newName = prompt("請輸入新玩家名稱：");
@@ -531,33 +825,50 @@
         container.appendChild(row);
     }
 
-    function calcSum() {
-        let sum = 0;
-        document.querySelectorAll('.amount-input').forEach(input => { if(input.value !== "") sum += Number(input.value); });
-        let sumEl = document.getElementById('currentSum');
-        sumEl.innerText = sum; sumEl.style.color = sum === 0 ? "var(--lime-green)" : "var(--win-color)";
-    }
-
     async function submitRecord() {
         let date = document.getElementById('recordDate').value;
         let memo = document.getElementById('recordMemo').value;
-        let players = []; let rows = document.querySelectorAll('.player-input-row');
-        let sum = 0, hasError = false;
+        
+        let players = []; 
+        let hasError = false;
+        let sum = 0;
+        
+        let rows = document.querySelectorAll('.player-input-row');
         rows.forEach(row => {
-            let name = row.querySelector('.player-select').value; let amount = row.querySelector('.amount-input').value;
-            if(name && amount !== "") { players.push({ name: name, amount: Number(amount) }); sum += Number(amount); } 
+            let name = row.querySelector('.player-select').value; 
+            let amount = row.querySelector('.amount-input').value;
+            if(name && amount !== "") { 
+                let val = Number(amount);
+                players.push({ name: name, amount: val }); 
+                sum += val;
+            } 
             else if ((name && amount === "") || (!name && amount !== "")) hasError = true;
         });
         if(players.length === 0) { alert("請至少輸入一位玩家與金額！"); return; }
         if(hasError) { alert("有選玩家就必須輸入金額，反之亦然！"); return; }
-        if(sum !== 0) { alert("防呆機制：金額總和必須為 0！ 目前總和為：" + sum); return; }
+        
+        if(sum !== 0) {
+            alert(`所有玩家的金額總和必須為 0！\n(目前加總為：${sum})`);
+            return;
+        }
+        
+        if (!date) { alert("請輸入日期 (格式 yyyy/mm/dd)！"); return; }
 
         let btn = document.querySelector('#addRecordModal .btn-lime');
         btn.innerText = "寫入雲端中..."; btn.disabled = true;
         try {
-            let res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'addRecord', date: date, memo: memo, players: players }) });
+            let res = await fetch(API_URL, { 
+                method: 'POST', 
+                body: JSON.stringify({ 
+                    action: 'addRecord', 
+                    date: date, 
+                    memo: memo, 
+                    misc: 0, 
+                    players: players 
+                }) 
+            });
             let result = await res.json();
-            if(result.status === 'success') { alert("對戰紀錄已寫入成功！"); addRecordModal.hide(); fetchData(); } 
+            if(result.status === 'success') { alert("紀錄已寫入成功！"); addRecordModal.hide(); fetchData(); } 
             else alert(result.message);
         } catch(e) { alert("連線錯誤"); }
         btn.innerText = "確認送出"; btn.disabled = false;
