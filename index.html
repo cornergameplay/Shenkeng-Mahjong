@@ -375,6 +375,9 @@
         let ascRecords = sortRecordsCore([...allData.records], true);
         let matchCount = 0;
         let miscCount = 0;
+        
+        // ★ 初始化總金流
+        let currentCashFlow = 0;
 
         ascRecords.forEach(record => {
             let isMatch = Object.values(record.scores).some(v => v !== null && v !== "");
@@ -391,6 +394,11 @@
                         let numScore = Number(score);
                         playerStats[p].allTimeAmount += numScore; 
                         
+                        // ★ 計算總金流：只累加所有出現過的「正值」(贏的錢)
+                        if (numScore > 0) {
+                            currentCashFlow += numScore;
+                        }
+                        
                         playerStats[p].games += 1;
                         if (numScore > 0) playerStats[p].wins += 1;
                         else if (numScore < 0) playerStats[p].loses += 1;
@@ -403,13 +411,6 @@
             } else {
                 miscCount++;
                 record.displayId = "雜支" + miscCount;
-            }
-        });
-        
-        let currentCashFlow = 0;
-        allData.players.forEach(p => {
-            if (playerStats[p].allTimeAmount > 0) {
-                currentCashFlow += playerStats[p].allTimeAmount;
             }
         });
         
@@ -565,7 +566,6 @@
                     type: 'value', 
                     axisLabel: { color: '#CBD5E1' }, 
                     splitLine: { lineStyle: { color: '#1E293B', type: 'dashed' } },
-                    // ★ 核心優化：智慧延展 X 軸，強迫向左右兩側多留出 2000 的空間，絕對不讓文字撞到邊界與 Y 軸！
                     min: function(value) { return value.min >= 0 ? 0 : Math.floor(value.min / 1000) * 1000 - 2000; },
                     max: function(value) { return value.max <= 0 ? 0 : Math.ceil(value.max / 1000) * 1000 + 2000; }
                 };
